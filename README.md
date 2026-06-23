@@ -1,2 +1,2 @@
 # estudos-python
-Alguns Exercícios
+# exercicio de classe
