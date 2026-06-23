@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Vendas</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%230b1220'/><rect x='24' y='58' width='14' height='22' fill='%2367E8F9'/><rect x='43' y='42' width='14' height='38' fill='%2322D3EE'/><rect x='62' y='28' width='14' height='52' fill='%2306B6D4'/></svg>">
+    <style>
+        :root{
+            --bg:#0b1220; --surface:#141d2e; --surface2:#1b2940; --line:#26324a;
+            --ink:#e7edf6; --muted:#8aa0bd; --brand:#22d3ee; --brand2:#06b6d4; --brand-strong:#0891b2;
+            --danger:#f43f5e; --danger-soft:#3a1620; --warn:#f59e0b; --warn-soft:#3a2a10;
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);min-height:100vh;
+            background:radial-gradient(1100px circle at 50% -8%, rgba(34,211,238,.12), transparent 55%), var(--bg);}
+        .wrap{max-width:960px;margin:0 auto;padding:40px 16px 64px}
+        .brand{display:flex;align-items:center;gap:14px}
+        .logo{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,var(--brand),var(--brand-strong));display:flex;align-items:flex-end;justify-content:center;gap:3px;padding:9px}
+        .logo i{width:6px;background:#06212a;border-radius:2px;display:block}
+        .logo i:nth-child(1){height:40%}.logo i:nth-child(2){height:65%}.logo i:nth-child(3){height:100%}
+        .eyebrow{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--brand);margin-bottom:4px}
+        h1{font-weight:800;letter-spacing:-.02em;font-size:30px}
+        .stats{display:flex;gap:14px;flex-wrap:wrap;margin:26px 0}
+        .stat{flex:1;min-width:210px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+        .stat .r{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+        .stat .v{font-size:28px;font-weight:800;margin-top:4px}
+        .stat .v small{font-size:15px;color:var(--muted);font-weight:600}
+        .alert-ok{background:rgba(34,211,238,.1);border:1px solid var(--brand-strong);color:var(--brand);border-radius:12px;padding:12px 16px;margin-bottom:18px;font-weight:600}
+        .card2{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+        .card2 .head{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line)}
+        .card2 .head h2{font-size:15px;font-weight:700}
+        .b{display:inline-block;padding:8px 14px;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;border:1px solid transparent;cursor:pointer}
+        .btn-cyan{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#06212a}
+        .btn-cyan:hover{filter:brightness(1.08)}
+        table{width:100%;border-collapse:collapse}
+        thead th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;text-align:left;padding:14px 18px;background:var(--surface2)}
+        thead th.num{text-align:right}thead th.center{text-align:center}thead th.acts{text-align:right}
+        tbody td{padding:14px 18px;border-top:1px solid var(--line);font-size:15px;vertical-align:middle}
+        tbody tr:hover{background:var(--surface2)}
+        .idcol{color:var(--muted);font-variant-numeric:tabular-nums}
+        .prod{font-weight:600}
+        .num{text-align:right;font-variant-numeric:tabular-nums}.center{text-align:center}
+        .qtd{display:inline-block;min-width:30px;padding:2px 10px;border-radius:99px;background:var(--surface2);border:1px solid var(--line);font-size:13px;font-weight:600}
+        .total{color:var(--brand);font-weight:700}
+        .acts{text-align:right;white-space:nowrap}
+        .b-sm{padding:6px 12px;font-size:13px;border-radius:9px}
+        .b-edit{background:var(--warn-soft);color:var(--warn);border:1px solid #5a4216}
+        .b-edit:hover{background:#4a3614}
+        .b-del{background:var(--danger-soft);color:var(--danger);border:1px solid #5a2230}
+        .b-del:hover{background:#4a1c28}
+        .vazio{text-align:center;color:var(--muted);padding:40px 16px}
+        @media(max-width:640px){.hide-sm{display:none}h1{font-size:24px}}
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="brand">
+            <div class="logo"><i></i><i></i><i></i></div>
+            <div>
+                <div class="eyebrow">Painel de Vendas</div>
+                <h1>Controle de Vendas</h1>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="r">Vendas registradas</div>
+                <div class="v" th:text="${vendas.size()}">0</div>
+            </div>
+            <div class="stat">
+                <div class="r">Faturamento total</div>
+                <div class="v"><small>R$</small>
+                    <span th:text="${vendas.isEmpty()} ? '0,00' : ${#numbers.formatDecimal(#aggregates.sum(vendas.![total]), 1, 2)}">0,00</span>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${mensagem}" class="alert-ok" th:text="${mensagem}"></div>
+
+        <div class="card2">
+            <div class="head">
+                <h2>Vendas</h2>
+                <a th:href="@{/vendas/nova}" class="b btn-cyan">+ Nova venda</a>
+            </div>
+            <div style="overflow-x:auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Data</th>
+                            <th>Produto</th>
+                            <th class="center hide-sm">Qtd</th>
+                            <th class="num hide-sm">Preço</th>
+                            <th class="num">Total</th>
+                            <th class="acts">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="v : ${vendas}">
+                            <td class="idcol" th:text="${v.id}"></td>
+                            <td th:text="${v.data}"></td>
+                            <td class="prod" th:text="${v.produto}"></td>
+                            <td class="center hide-sm"><span class="qtd" th:text="${v.quantidade}"></span></td>
+                            <td class="num hide-sm">R$ <span th:text="${#numbers.formatDecimal(v.precoUnitario, 1, 2)}"></span></td>
+                            <td class="num total">R$ <span th:text="${#numbers.formatDecimal(v.total, 1, 2)}"></span></td>
+                            <td class="acts">
+                                <a th:href="@{/vendas/editar/{id}(id=${v.id})}" class="b b-sm b-edit">Editar</a>
+                                <a th:href="@{/vendas/excluir/{id}(id=${v.id})}" class="b b-sm b-del"
+                                   onclick="return confirm('Tem certeza que deseja excluir esta venda?')">Excluir</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${vendas.isEmpty()}">
+                            <td colspan="7" class="vazio">Nenhuma venda cadastrada ainda. Clique em "Nova venda" para começar.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

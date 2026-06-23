@@ -1,0 +1,39 @@
+:root {
+    --bs-primary: #06B6D4;
+    --bs-primary-rgb: 6, 182, 212;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(900px circle at 50% -10%, rgba(6, 182, 212, 0.18), transparent 60%),
+        #0F172A;
+}
+
+.btn-primary {
+    --bs-btn-bg: #06B6D4;
+    --bs-btn-border-color: #06B6D4;
+    --bs-btn-hover-bg: #0891B2;
+    --bs-btn-hover-border-color: #0891B2;
+    --bs-btn-color: #06212A;
+    --bs-btn-hover-color: #06212A;
+    font-weight: 600;
+}
+
+.card {
+    background-color: #1E293B;
+    border: 1px solid #334155;
+}
+
+.list-group-item {
+    background-color: transparent;
+}
+
+.total-box {
+    background: rgba(6, 182, 212, 0.12);
+    border: 1px solid rgba(6, 182, 212, 0.35);
+}
+
+.total-box strong {
+    color: #22D3EE;
+}
